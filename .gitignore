@@ -1,5 +1,6 @@
 /assets
 /vendor
+/logs
 
 /input_files/*
 !/input_files/.gitkeep

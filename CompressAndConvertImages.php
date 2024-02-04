@@ -60,6 +60,7 @@ class CompressAndConvertImages
 
         foreach ($files as $file) {
             // Ottieni l'istanza di Intervention Image dall'immagine caricata tramite il modulo
+            $this->logger->info('Working on: ' . $file['filename']);
             $image = Image::make(INPUT . $file['filename']);
             // Correggi l'orientamento dell'immagine basandoti sul metadata EXIF
             $image->orientate();
@@ -74,22 +75,22 @@ class CompressAndConvertImages
             // Info di DEBUG sui filesizes
             $filesize = filesize(INPUT . $file['filename']);
             $compressed_filesize = filesize($compressed_filepath);
-            $this->logger->debug('FILESIZE ORIGINALE: ' . $filesize);
-            $this->logger->debug('FILESIZE COMPRESSO: ' . $compressed_filesize);
+            $this->logger->debug('ORIGINAL FILESIZE: ' . $filesize);
+            $this->logger->debug('COMPRESSED FILESIZE: ' . $compressed_filesize);
         }
     }
 }
 
-$log->info("**** Inizio procedura ****");
+$log->info("**** START ****");
 try {
     if (!is_dir(INPUT) || !is_dir(OUTPUT)) {
         throw new Exception("Error in directories configuration: check your env file");
     }
     $compressor = new CompressAndConvertImages($log);
     $compressor->run();
-    $log->info("**** Fine procedura ****");
+    $log->info("**** END ****");
 } catch (Exception $e) {
     $log->error($e->getMessage());
-    $log->info("**** Procedura interrotta ****");
+    $log->info("**** INTERRUPTED ****");
 }
 exit();
