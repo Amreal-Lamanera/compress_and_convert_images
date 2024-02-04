@@ -1,0 +1,9 @@
+/assets
+/vendor
+
+/input_files/*
+!/input_files/.gitkeep
+/output_files/*
+!/output_files/.gitkeep
+
+/include/setup/env/.env

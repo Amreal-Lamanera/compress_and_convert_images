@@ -1,0 +1,18 @@
+{
+    "authors": [
+        {
+            "name": "Francesco Pieraccini",
+            "email": "pieraccini.francesco@gmail.com",
+            "homepage": "https://www.francescopieraccini.it.com"
+        }
+    ],
+    "require": {
+        "robmorgan/phinx": "*",
+        "phpmailer/phpmailer": "*",
+        "smarty/smarty": "^4.3",
+        "vlucas/phpdotenv": "^5.5",
+        "monolog/monolog": "^2.9",
+        "ext-mysqli": "*",
+        "intervention/image": "^2.7"
+    }
+}
