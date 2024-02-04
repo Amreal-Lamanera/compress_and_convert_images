@@ -5,7 +5,7 @@ use Intervention\Image\ImageManagerStatic as Image;
 
 require_once __DIR__ . '/include/setup/config.php';
 
-class Compressor
+class CompressAndConvertImages
 {
     public Logger $logger;
 
@@ -47,6 +47,9 @@ class Compressor
         return $filesToGet;
     }
 
+    /**
+     * @throws Exception
+     */
     public function run()
     {
         $files = $this->getFiles();
@@ -67,6 +70,8 @@ class Compressor
 
             // Salva l'immagine compressa su disco
             $image->save($compressed_filepath, QUALITY);
+
+            // Info di DEBUG sui filesizes
             $filesize = filesize(INPUT . $file['filename']);
             $compressed_filesize = filesize($compressed_filepath);
             $this->logger->debug('FILESIZE ORIGINALE: ' . $filesize);
@@ -80,7 +85,7 @@ try {
     if (!is_dir(INPUT) || !is_dir(OUTPUT)) {
         throw new Exception("Error in directories configuration: check your env file");
     }
-    $compressor = new Compressor($log);
+    $compressor = new CompressAndConvertImages($log);
     $compressor->run();
     $log->info("**** Fine procedura ****");
 } catch (Exception $e) {

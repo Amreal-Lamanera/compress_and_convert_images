@@ -2,14 +2,12 @@
 
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\RotatingFileHandler;
-//use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 // create a log channel
 $log = new Logger('checkImgsLogger');
-//$log->pushHandler(new StreamHandler('./logs/checkImgs.log', Logger::DEBUG));
 
 // Aggiungo un handler per la console
 $log->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, Logger::DEBUG));
