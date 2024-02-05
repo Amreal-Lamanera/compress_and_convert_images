@@ -96,7 +96,8 @@ class CompressAndConvertImages
             throw new NoFilesException('No workable files were found. File extensions allowed are: ' . $extensions);
         }
 
-        foreach ($files as $file) {
+        foreach ($files as $key => $file) {
+            $this->logger->info("Step: " . $key + 1 . "/" . count($files));
             $this->handleFileAndSave($file);
         }
     }
@@ -117,6 +118,6 @@ try {
     $log->info("**** END ****");
 } catch (NoFilesException | Exception $e) {
     $log->error($e->getMessage());
-    $log->info("**** INTERRUPTED ****");
+    $log->warning("**** INTERRUPTED ****");
 }
 exit();
