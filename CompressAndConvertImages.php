@@ -68,7 +68,7 @@ class CompressAndConvertImages
         $file_name = str_replace(".{$file['ext']}", '', $file['filename']);
         $compressed_filepath = OUTPUT . "$file_name." . EXTENSION;
 
-        // encode jpeg as webp format
+        // encode img by path
         $encoded = $image->encodeByPath($compressed_filepath, quality: intval(QUALITY)); // Intervention\Image\EncodedImage
         $encoded->save($compressed_filepath);
 
