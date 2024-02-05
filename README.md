@@ -13,7 +13,7 @@ Hello there! This is a simple utility to compress and convert your photos or ima
 5. You will find the output in `output_files` directory and the logs of the utility in `logs` and in your terminal window.
 
 ### Examples
-- To convert your images without compression, set the `EXTENSION` in the .env file to your desired format (e.g., "WEBP") and leave the `QUALITY` as `100`.
-- To convert and compress your images to WEBP format with 20% compression, set the `EXTENSION` in the `.env` file to `WEBP` and adjust the `QUALITY` to `20`.
+- To convert your images without compression, set the `EXTENSION` in the .env file to your desired format (e.g., "webp") and leave the `QUALITY` as `100`.
+- To convert and compress your images to WEBP format with 20% compression, set the `EXTENSION` in the `.env` file to `webp` and adjust the `QUALITY` to `20`.
 
 If you encounter any issues or have questions, feel free to reach out!
