@@ -1,6 +1,10 @@
 <?php
 
-use Intervention\Image\ImageManagerStatic as Image;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Encoders\AutoEncoder;
+use Intervention\Image\Encoders\WebpEncoder;
+use Intervention\Image\Encoders\GifEncoder;
 use Monolog\Logger;
 
 require_once __DIR__ . '/include/setup/config.php';
@@ -51,6 +55,33 @@ class CompressAndConvertImages
         return [$filesToGet, $discardedFiles];
     }
 
+    public function handleFileAndSave($file)
+    {
+        $this->logger->info('Working on: ' . $file['filename']);
+
+        // create new manager instance with desired driver
+        $manager = new ImageManager(Driver::class);
+
+        // read image from file system
+        $image = $manager->read(INPUT . $file['filename']);
+
+        // encode as the originally read image format
+//        $encoded = $image->encode(); // Intervention\Image\EncodedImage
+
+        $file_name = str_replace(".{$file['ext']}", '', $file['filename']);
+        $compressed_filepath = OUTPUT . "$file_name." . EXTENSION;
+
+        // encode jpeg as webp format
+        $encoded = $image->encode(new WebpEncoder(quality: intval(QUALITY))); // Intervention\Image\EncodedImage
+        $encoded->save($compressed_filepath);
+
+        // Info di DEBUG sui filesizes
+        $filesize = filesize(INPUT . $file['filename']);
+        $compressed_filesize = filesize($compressed_filepath);
+        $this->logger->debug('ORIGINAL FILESIZE: ' . $filesize);
+        $this->logger->debug('COMPRESSED FILESIZE: ' . $compressed_filesize);
+    }
+
     /**
      * @throws Exception
      */
@@ -67,24 +98,7 @@ class CompressAndConvertImages
         }
 
         foreach ($files as $file) {
-            $this->logger->info('Working on: ' . $file['filename']);
-            // Ottieni l'istanza di Intervention Image dall'immagine caricata tramite il modulo
-            $image = Image::make(INPUT . $file['filename']);
-            // Correggi l'orientamento dell'immagine basandoti sul metadata EXIF
-            $image->orientate();
-
-            /***************** GESTIONE COMPRESSIONE *****************************/
-            $file_name = str_replace(".{$file['ext']}", '', $file['filename']);
-            $compressed_filepath = OUTPUT . "$file_name." . EXTENSION;
-
-            // Salva l'immagine compressa su disco
-            $image->save($compressed_filepath, QUALITY);
-
-            // Info di DEBUG sui filesizes
-            $filesize = filesize(INPUT . $file['filename']);
-            $compressed_filesize = filesize($compressed_filepath);
-            $this->logger->debug('ORIGINAL FILESIZE: ' . $filesize);
-            $this->logger->debug('COMPRESSED FILESIZE: ' . $compressed_filesize);
+            $this->handleFileAndSave($file);
         }
     }
 }
