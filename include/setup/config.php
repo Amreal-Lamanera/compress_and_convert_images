@@ -9,13 +9,13 @@ require_once __DIR__ . '/../../include/class/NoFilesException.php';
 
 // create a log channel
 $log = new Logger('checkImgsLogger');
-
-// Aggiungo un handler per la console
-$log->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, Logger::DEBUG));
-
-$logRotate = new RotatingFileHandler("./logs/checkImgs.log", 10, Logger::INFO);
-
+// handler to log in console
+$log->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM));
+// files rotation
+$logRotate = new RotatingFileHandler("./logs/checkImgs.log", 10);
+// files handler
 $log->pushHandler($logRotate);
 
+// dotenv load
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/env');
 $dotenv->load();

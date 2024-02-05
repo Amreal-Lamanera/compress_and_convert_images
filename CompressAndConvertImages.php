@@ -1,11 +1,15 @@
 <?php
 
-use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
 use Monolog\Logger;
 
 require_once __DIR__ . '/include/setup/config.php';
 
+/**
+ * Class CompressAndConvertImages
+ * @author Francesco Pieraccini
+ */
 class CompressAndConvertImages
 {
     private string $input_dir;
@@ -22,6 +26,13 @@ class CompressAndConvertImages
         'webp'
     ];
 
+    const MANDATORY_PARAMS = [
+        'INPUT',
+        'OUTPUT',
+        'QUALITY',
+        'EXTENSION',
+    ];
+
     /**
      * CompressAndConvertImages constructor.
      *
@@ -30,15 +41,8 @@ class CompressAndConvertImages
      */
     public function __construct(Logger $log)
     {
-        $mandatory_params = [
-            'INPUT',
-            'OUTPUT',
-            'QUALITY',
-            'EXTENSION',
-        ];
-
-        foreach ($mandatory_params as $mandatory_param) {
-            if (!isset($_ENV["$mandatory_param"])) {
+        foreach (self::MANDATORY_PARAMS as $mandatory_param) {
+            if (!isset($_ENV[$mandatory_param])) {
                 throw new Exception(
                     'Mandatory param missed in env: ' .
                     $mandatory_param
@@ -50,7 +54,9 @@ class CompressAndConvertImages
         $this->output_dir = __DIR__ . '/' . $_ENV['OUTPUT'] . '/';
 
         if (!is_dir($this->input_dir) || !is_dir($this->output_dir)) {
-            throw new Exception("Error in directories configuration: check your env file");
+            throw new Exception(
+                "Error in directories configuration: check your env file"
+            );
         }
 
         $this->logger = $log;
@@ -61,19 +67,23 @@ class CompressAndConvertImages
     }
 
     /**
-     * Scan the input dir and return an array with acceptedFiles and discardedFiles.
+     * Scan the $dir and return an array with acceptedFiles
+     * and discardedFiles.
+     *
+     * @param string $dir
      *
      * @return array
      * @throws NoFilesException
      */
-    private function getFiles(): array
+    private function getFiles(string $dir): array
     {
-        $files = scandir($this->input_dir);
+        $files = scandir($dir);
         $acceptedFiles = [];
         $discardedFiles = [];
 
         if (!$files || empty($files)) {
-            throw new NoFilesException("Cartella vuota: " . $this->input_dir);
+            throw new NoFilesException(
+                "Empty directory: {$dir}");
         }
 
         foreach ($files as $file) {
@@ -84,7 +94,9 @@ class CompressAndConvertImages
                 $file !== '..' &&
                 $file !== '.gitkeep'
             ) {
-                if (in_array(strtolower($file_ext), self::FILE_EXT_ALLOWED)) {
+                if (
+                in_array(strtolower($file_ext), self::FILE_EXT_ALLOWED)
+                ) {
                     $acceptedFiles[] = [
                         'ext' => $file_ext,
                         'filename' => $file
@@ -101,9 +113,15 @@ class CompressAndConvertImages
      * A function that utilizes ImageManager to convert and compress the file.
      * Once completed, the compressed file will be saved in the OUTPUT directory.
      *
-     * @param $file
+     * @param array $file - [filename, ext]
+     * @param string $input_dir
+     * @param string $output_dir
      */
-    private function handleFileAndSave($file)
+    private function handleFileAndSave(
+        array $file,
+        string $input_dir,
+        string $output_dir
+    )
     {
         $this->logger->info('Working on: ' . $file['filename']);
 
@@ -111,23 +129,31 @@ class CompressAndConvertImages
         $manager = new ImageManager(Driver::class);
 
         // read image from file system
-        $image = $manager->read($this->input_dir . $file['filename']);
+        $image = $manager->read($input_dir . $file['filename']);
 
         // encode as the originally read image format
 //        $encoded = $image->encode(); // Intervention\Image\EncodedImage
 
-        $file_name = str_replace(".{$file['ext']}", '', $file['filename']);
-        $compressed_filepath = $this->output_dir . "$file_name." . $this->extension;
+        $file_name =
+            str_replace(".{$file['ext']}", '', $file['filename']);
+        $compressed_filepath =
+
+            $output_dir . "$file_name." . $this->extension;
 
         // encode img by path
-        $encoded = $image->encodeByPath($compressed_filepath, quality: intval($this->quality)); // Intervention\Image\EncodedImage
+        $encoded = $image->encodeByPath(
+            $compressed_filepath,
+            quality: intval($this->quality)
+        );
         $encoded->save($compressed_filepath);
 
-        // Info di DEBUG sui filesizes
-        $filesize = filesize($this->input_dir . $file['filename']);
+        // files size debug info
+        $filesize = filesize($input_dir . $file['filename']);
         $compressed_filesize = filesize($compressed_filepath);
         $this->logger->debug('ORIGINAL FILESIZE: ' . $filesize);
-        $this->logger->debug('COMPRESSED FILESIZE: ' . $compressed_filesize);
+        $this->logger->debug(
+            "COMPRESSED FILESIZE: $compressed_filesize"
+        );
     }
 
     /**
@@ -142,8 +168,15 @@ class CompressAndConvertImages
         $zip_filename = 'IMGS_' . date("Ymd_His") . ".zip";
         $zip_filepath = $this->output_dir . $zip_filename;
 
-        if (!$zip->open($zip_filepath, ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
-            throw new Exception("Errore durante la creazione del file ZIP");
+        if (
+        !$zip->open(
+            $zip_filepath,
+            ZipArchive::CREATE | ZipArchive::OVERWRITE
+        )
+        ) {
+            throw new Exception(
+                "ZIP file creation failed."
+            );
         }
 
         $files = scandir($this->output_dir);
@@ -160,15 +193,21 @@ class CompressAndConvertImages
     }
 
     /**
-     * Delete all the files in $dir.
+     * Delete all the files in $dir excepted zip files.
      *
      * @param $dir
      */
-    private function removeFilesFromDir($dir) {
+    private function removeFilesFromDir($dir)
+    {
         $files = scandir($dir);
 
         foreach ($files as $file) {
-            if ($file !== '.' && $file !== '..' && $file !== '.gitkeep' && !str_contains($file, '.zip')) {
+            if (
+                $file !== '.' &&
+                $file !== '..' &&
+                $file !== '.gitkeep' &&
+                !str_contains($file, '.zip')
+            ) {
                 unlink($dir . '/' . $file);
             }
         }
@@ -182,25 +221,36 @@ class CompressAndConvertImages
      */
     public function run()
     {
-        [$files, $discarded] = $this->getFiles();
+        [$files, $discarded] = $this->getFiles($this->input_dir);
 
         if (!empty($discarded)) {
             $this->logger->warning('Discarded files:', $discarded);
         }
 
         if (empty($files)) {
-            $extensions = implode(',', self::FILE_EXT_ALLOWED);
-            throw new NoFilesException('No workable files were found. File extensions allowed are: ' . $extensions);
+            $extensions = implode(', ', self::FILE_EXT_ALLOWED);
+            throw new NoFilesException(
+                'No workable files were found. ' .
+                "File extensions allowed are: $extensions");
         }
 
         foreach ($files as $key => $file) {
-            $this->logger->info("Step: " . $key + 1 . "/" . count($files));
-            $this->handleFileAndSave($file);
+            $this->logger->info(
+                "Step: " . $key + 1 . "/" . count($files)
+            );
+            $this->handleFileAndSave(
+                $file,
+                $this->input_dir,
+                $this->output_dir
+            );
         }
 
         if ($this->fl_zip) {
             $this->logger->info("Zipping files...");
-            $this->logger->info("Zip file created: " . $this->zipFiles());
+            $this->logger->info(
+                "Zip file created: " .
+                $this->zipFiles()
+            );
             $this->removeFilesFromDir($this->output_dir);
         }
 
