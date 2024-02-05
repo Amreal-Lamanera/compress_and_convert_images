@@ -2,7 +2,6 @@
 
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
-use Intervention\Image\Encoders\WebpEncoder;
 use Monolog\Logger;
 
 require_once __DIR__ . '/include/setup/config.php';
@@ -70,7 +69,7 @@ class CompressAndConvertImages
         $compressed_filepath = OUTPUT . "$file_name." . EXTENSION;
 
         // encode jpeg as webp format
-        $encoded = $image->encode(new WebpEncoder(quality: intval(QUALITY))); // Intervention\Image\EncodedImage
+        $encoded = $image->encodeByPath($compressed_filepath, quality: intval(QUALITY)); // Intervention\Image\EncodedImage
         $encoded->save($compressed_filepath);
 
         // Info di DEBUG sui filesizes
