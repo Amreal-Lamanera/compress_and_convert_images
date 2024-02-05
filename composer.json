@@ -9,6 +9,7 @@
     "require": {
         "vlucas/phpdotenv": "^5.5",
         "monolog/monolog": "^2.9",
-        "intervention/image": "*"
+        "intervention/image": "*",
+        "ext-zip": "*"
     }
 }

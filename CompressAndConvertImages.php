@@ -19,7 +19,7 @@ class CompressAndConvertImages
      * @return array
      * @throws NoFilesException
      */
-    public function getFiles(): array
+    private function getFiles(): array
     {
         // Ottieni un array contenente tutti i file e le cartelle nella directory
         $files = scandir(INPUT);
@@ -52,7 +52,7 @@ class CompressAndConvertImages
         return [$filesToGet, $discardedFiles];
     }
 
-    public function handleFileAndSave($file)
+    private function handleFileAndSave($file)
     {
         $this->logger->info('Working on: ' . $file['filename']);
 
@@ -80,6 +80,47 @@ class CompressAndConvertImages
     }
 
     /**
+     * Crea il file zip con tutte le immagini create dalla procedura
+     *
+     * @return string
+     * @throws Exception
+     */
+    private function zipFiles(): string
+    {
+        $zip = new ZipArchive();
+        $filename = 'IMGS_' . date("Ymd_His") . ".zip";
+        $zipFile = OUTPUT . $filename; // Percorso completo del file ZIP
+
+        if (!$zip->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
+            throw new Exception("Errore durante la creazione del file ZIP");
+        }
+
+        $files = scandir(OUTPUT);
+
+        foreach ($files as $file) {
+            if ($file !== '.' && $file !== '..' && $file !== '.gitkeep') {
+                // Aggiungi il file corrente all'archivio ZIP
+                $zip->addFile(OUTPUT . $file, $file);
+            }
+        }
+
+        $zip->close();
+
+        // Restituisce il filename
+        return $filename;
+    }
+
+    private function removeFilesFromDir($dir) {
+        $files = scandir($dir);
+
+        foreach ($files as $file) {
+            if ($file !== '.' && $file !== '..' && $file !== '.gitkeep' && !str_contains($file, '.zip')) {
+                unlink($dir . '/' . $file);
+            }
+        }
+    }
+
+    /**
      * @throws Exception
      * @throws NoFilesException
      */
@@ -100,6 +141,13 @@ class CompressAndConvertImages
             $this->logger->info("Step: " . $key + 1 . "/" . count($files));
             $this->handleFileAndSave($file);
         }
+
+        if (FL_ZIP == 'true') {
+            $this->logger->info("Zipping files...");
+            $this->logger->info("Zip file created: " . $this->zipFiles());
+            $this->removeFilesFromDir(OUTPUT);
+        }
+
     }
 }
 

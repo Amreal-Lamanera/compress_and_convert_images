@@ -25,3 +25,4 @@ define('EXTENSION', $_ENV['EXTENSION']);
 define('INPUT', __DIR__ . '/../../' . $_ENV['INPUT'] . '/');
 define('OUTPUT', __DIR__ . '/../../' . $_ENV['OUTPUT'] . '/');
 define('FILE_EXT_ALLOWED', array('jpg', 'jpeg', 'png', 'webp'));
+define('FL_ZIP', (defined($_ENV['FL_ZIP']) ? $_ENV['FL_ZIP'] : false));
