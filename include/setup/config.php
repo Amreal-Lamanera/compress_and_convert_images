@@ -5,6 +5,7 @@ use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../include/class/NoFilesException.php';
 
 // create a log channel
 $log = new Logger('checkImgsLogger');

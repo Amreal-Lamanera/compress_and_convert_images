@@ -2,9 +2,7 @@
 
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
-use Intervention\Image\Encoders\AutoEncoder;
 use Intervention\Image\Encoders\WebpEncoder;
-use Intervention\Image\Encoders\GifEncoder;
 use Monolog\Logger;
 
 require_once __DIR__ . '/include/setup/config.php';
@@ -20,7 +18,7 @@ class CompressAndConvertImages
 
     /**
      * @return array
-     * @throws Exception
+     * @throws NoFilesException
      */
     public function getFiles(): array
     {
@@ -30,7 +28,7 @@ class CompressAndConvertImages
         $discardedFiles = [];
 
         if (!$files || empty($files)) {
-            throw new Exception("Cartella vuota: " . INPUT);
+            throw new NoFilesException("Cartella vuota: " . INPUT);
         }
 
         // Itera attraverso l'array
@@ -84,6 +82,7 @@ class CompressAndConvertImages
 
     /**
      * @throws Exception
+     * @throws NoFilesException
      */
     public function run()
     {
@@ -94,7 +93,8 @@ class CompressAndConvertImages
         }
 
         if (empty($files)) {
-            throw new Exception('No workable files were found. File extensions allowed are: ', FILE_EXT_ALLOWED);
+            $extensions = implode(',', FILE_EXT_ALLOWED);
+            throw new NoFilesException('No workable files were found. File extensions allowed are: ' . $extensions);
         }
 
         foreach ($files as $file) {
@@ -116,7 +116,7 @@ try {
     $compressor = new CompressAndConvertImages($log);
     $compressor->run();
     $log->info("**** END ****");
-} catch (Exception $e) {
+} catch (NoFilesException | Exception $e) {
     $log->error($e->getMessage());
     $log->info("**** INTERRUPTED ****");
 }
