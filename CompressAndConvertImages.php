@@ -1,7 +1,7 @@
 <?php
 
-use Monolog\Logger;
 use Intervention\Image\ImageManagerStatic as Image;
+use Monolog\Logger;
 
 require_once __DIR__ . '/include/setup/config.php';
 
@@ -15,14 +15,15 @@ class CompressAndConvertImages
     }
 
     /**
-     * @throws Exception
      * @return array
+     * @throws Exception
      */
-    public function getFiles()
+    public function getFiles(): array
     {
         // Ottieni un array contenente tutti i file e le cartelle nella directory
         $files = scandir(INPUT);
         $filesToGet = [];
+        $discardedFiles = [];
 
         if (!$files || empty($files)) {
             throw new Exception("Cartella vuota: " . INPUT);
@@ -32,19 +33,22 @@ class CompressAndConvertImages
         foreach ($files as $file) {
             $file_ext = explode('.', $file);
             $file_ext = end($file_ext);
-            // Ignora i file speciali . e ..
             if (
                 $file !== '.' &&
                 $file !== '..' &&
-                in_array($file_ext, FILE_EXT_ALLOWED)
+                $file !== '.gitkeep'
             ) {
-                $filesToGet[] = [
-                    'ext' => $file_ext,
-                    'filename' => $file
-                ];
+                if (in_array(strtolower($file_ext), FILE_EXT_ALLOWED)) {
+                    $filesToGet[] = [
+                        'ext' => $file_ext,
+                        'filename' => $file
+                    ];
+                } else {
+                    $discardedFiles[] = $file;
+                }
             }
         }
-        return $filesToGet;
+        return [$filesToGet, $discardedFiles];
     }
 
     /**
@@ -52,15 +56,19 @@ class CompressAndConvertImages
      */
     public function run()
     {
-        $files = $this->getFiles();
+        [$files, $discarded] = $this->getFiles();
+
+        if (!empty($discarded)) {
+            $this->logger->warning('Discarded files:', $discarded);
+        }
 
         if (empty($files)) {
-            throw new Exception('No files were found');
+            throw new Exception('No workable files were found. File extensions allowed are: ', FILE_EXT_ALLOWED);
         }
 
         foreach ($files as $file) {
-            // Ottieni l'istanza di Intervention Image dall'immagine caricata tramite il modulo
             $this->logger->info('Working on: ' . $file['filename']);
+            // Ottieni l'istanza di Intervention Image dall'immagine caricata tramite il modulo
             $image = Image::make(INPUT . $file['filename']);
             // Correggi l'orientamento dell'immagine basandoti sul metadata EXIF
             $image->orientate();
@@ -81,6 +89,11 @@ class CompressAndConvertImages
     }
 }
 
+/**
+ * From config.php
+ *
+ * @var $log
+ */
 $log->info("**** START ****");
 try {
     if (!is_dir(INPUT) || !is_dir(OUTPUT)) {
