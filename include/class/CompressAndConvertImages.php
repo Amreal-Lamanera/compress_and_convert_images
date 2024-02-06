@@ -2,7 +2,6 @@
 
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
-use Monolog\Logger;
 
 /**
  * Class CompressAndConvertImages
