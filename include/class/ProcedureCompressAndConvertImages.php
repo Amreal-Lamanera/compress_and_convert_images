@@ -1,5 +1,6 @@
 <?php
 
+use FPDEV\CompressAndConvertImages;
 use Monolog\Logger;
 
 /**

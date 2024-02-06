@@ -1,4 +1,10 @@
 {
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/Amreal-Lamanera/compress_and_convert_images_library"
+        }
+    ],
     "authors": [
         {
             "name": "Francesco Pieraccini",
@@ -7,10 +13,11 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": ">=8.1",
         "vlucas/phpdotenv": "*",
         "monolog/monolog": "*",
         "intervention/image": "*",
-        "ext-zip": "*"
+        "ext-zip": "*",
+        "fpdev/compress_and_convert_images": "*"
     }
 }

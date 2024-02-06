@@ -11,6 +11,7 @@ use Monolog\Logger;
 require_once __DIR__ . '/include/setup/config.php';
 
 try {
+    ini_set('memory_limit', '512M');
     $log->info("**** START ****");
 
     // check mandatory params in env
