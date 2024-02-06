@@ -12,7 +12,6 @@ class CompressAndConvertImages
 {
     private int $quality;
     private string $extension;
-    private Logger $logger;
 
     private const FILE_EXT_ALLOWED = [
         'jpg',
@@ -24,19 +23,16 @@ class CompressAndConvertImages
     /**
      * CompressAndConvertImages constructor.
      *
-     * @param Logger $log           - logger
      * @param string $extension     - extension to convert
      * @param int $quality          - quality to compress
      *
      * @throws Exception
      */
     public function __construct(
-        Logger $log,
         string $extension,
         int $quality
     )
     {
-        $this->logger = $log;
         $this->quality = $quality;
         $this->extension = $extension;
     }
@@ -107,8 +103,6 @@ class CompressAndConvertImages
         string $input_dir,
         string $output_dir
     ) {
-        $this->logger->info('Working on: ' . $file['filename']);
-
         // create new manager instance with desired driver
         $manager = new ImageManager(Driver::class);
 
@@ -128,14 +122,6 @@ class CompressAndConvertImages
             quality: $this->quality
         );
         $encoded->save($compressed_filepath);
-
-        // files size debug info
-        $filesize = filesize($input_dir . '/' . $file['filename']);
-        $compressed_filesize = filesize($compressed_filepath);
-        $this->logger->debug('ORIGINAL FILESIZE: ' . $filesize);
-        $this->logger->debug(
-            "COMPRESSED FILESIZE: $compressed_filesize"
-        );
     }
 
     /**

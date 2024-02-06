@@ -59,7 +59,6 @@ class ProcedureCompressAndConvertImages
     )
     {
         $compressor = new CompressAndConvertImages(
-            $this->logger,
             $extension,
             $quality
         );
@@ -80,12 +79,18 @@ class ProcedureCompressAndConvertImages
             $this->logger->info(
                 "Step: " . $key + 1 . "/" . count($files)
             );
+            $this->logger->info(
+                "Working on: {$file['filename']}"
+            );
             $compressor->handleFileAndSave(
                 $file,
                 $this->input_dir,
                 $this->output_dir
             );
         }
+        $this->logger->info(
+            "All files are converted and compressed!"
+        );
 
         if ($this->fl_zip) {
             $this->logger->info("Zipping files...");
