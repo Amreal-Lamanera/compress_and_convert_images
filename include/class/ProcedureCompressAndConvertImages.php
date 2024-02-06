@@ -1,7 +1,8 @@
 <?php
 
-use FPDEV\Images\CompressAndConvertImages;
+use FPDEV\Images\CompressAndConvert;
 use FPDEV\Images\NoFilesException;
+use FPDEV\Images\NoValidFilesException;
 use Monolog\Logger;
 
 /**
@@ -52,17 +53,19 @@ class ProcedureCompressAndConvertImages
      * @param int $quality      - quality to compress
      *
      * @throws NoFilesException
+     * @throws NoValidFilesException
      * @throws Exception
      */
     public function run(
         string $extension,
         int $quality,
     ) {
-        $compressor = new CompressAndConvertImages(
+        $compressor = new CompressAndConvert(
             $extension,
             $quality
         );
-        [$files, $discarded] = $compressor->getFiles($this->input_dir);
+        [$files, $discarded] =
+            $compressor->getFileArraysFromDir($this->input_dir);
 
         if (!empty($discarded)) {
             $this->logger->warning('Discarded files:', $discarded);
@@ -72,7 +75,8 @@ class ProcedureCompressAndConvertImages
             $extensions = implode(', ', $compressor->getFileExtAllowed());
             throw new NoFilesException(
                 'No workable files were found. ' .
-                "File extensions allowed are: $extensions");
+                    "File extensions allowed are: $extensions"
+            );
         }
 
         foreach ($files as $key => $file) {
@@ -82,7 +86,7 @@ class ProcedureCompressAndConvertImages
             $this->logger->info(
                 "Working on: {$file['filename']}"
             );
-            $compressor->handleFileAndSave(
+            $compressor->compressConvertAndSave(
                 $file,
                 $this->input_dir,
                 $this->output_dir
@@ -96,10 +100,9 @@ class ProcedureCompressAndConvertImages
             $this->logger->info("Zipping files...");
             $this->logger->info(
                 "Zip file created: " .
-                $compressor->zipFiles($this->output_dir)
+                    $compressor->zipFiles($this->output_dir)
             );
             $compressor->removeFilesFromDir($this->output_dir);
         }
-
     }
 }

@@ -3,11 +3,10 @@
 /**
  * From config.php
  *
- * @var Logger $log
+ * @var Monolog\Logger $log
  */
 
 use FPDEV\Images\NoFilesException;
-use Monolog\Logger;
 
 require_once __DIR__ . '/include/setup/config.php';
 
@@ -26,7 +25,7 @@ try {
         if (!isset($_ENV[$mandatory_param])) {
             throw new Exception(
                 'Mandatory param missed in env: ' .
-                $mandatory_param
+                    $mandatory_param
             );
         }
     }

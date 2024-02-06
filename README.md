@@ -1,10 +1,9 @@
-# Compress And Convert Images
+# Compress And Convert Images <a href="https://www.francescopieraccini.it/"><img src="./blue_nome.svg"  alt="FrancescoPieraccini Logo" width="75" style="vertical-align:middle; padding-left:1rem;"/></a>
 Hello there! This is a simple utility to compress and convert your photos or images.
 It uses my library FP\compress_and_convert_images_library, you can check it
 [here](https://github.com/Amreal-Lamanera/compress_and_convert_images_library)
 
-If you encounter any issues or have questions, feel free to reach out! And don't forget to check out my website at:
-https://www.francescopieraccini.it/
+If you encounter any issues or have questions, feel free to reach out! And don't forget to check out my website at: [Francesco Pieraccini WebSite](https://www.francescopieraccini.it)
 
 ## Requirements
 - PHP (>=8.1) installed on your computer (you can check this: https://www.php.net/manual/en/install.php).
