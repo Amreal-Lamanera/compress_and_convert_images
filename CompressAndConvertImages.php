@@ -26,32 +26,28 @@ class CompressAndConvertImages
         'webp'
     ];
 
-    const MANDATORY_PARAMS = [
-        'INPUT',
-        'OUTPUT',
-        'QUALITY',
-        'EXTENSION',
-    ];
-
     /**
      * CompressAndConvertImages constructor.
      *
      * @param Logger $log
+     * @param string $input_dir
+     * @param string $output_dir
+     * @param string $extension
+     * @param int $quality
+     * @param bool $fl_zip
      * @throws Exception
      */
-    public function __construct(Logger $log)
+    public function __construct(
+        Logger $log,
+        string $input_dir,
+        string $output_dir,
+        string $extension,
+        int $quality,
+        bool $fl_zip = false
+    )
     {
-        foreach (self::MANDATORY_PARAMS as $mandatory_param) {
-            if (!isset($_ENV[$mandatory_param])) {
-                throw new Exception(
-                    'Mandatory param missed in env: ' .
-                    $mandatory_param
-                );
-            }
-        }
-
-        $this->input_dir = __DIR__ . '/' . $_ENV['INPUT'] . '/';
-        $this->output_dir = __DIR__ . '/' . $_ENV['OUTPUT'] . '/';
+        $this->input_dir = __DIR__ . '/' . $input_dir . '/';
+        $this->output_dir = __DIR__ . '/' . $output_dir . '/';
 
         if (!is_dir($this->input_dir) || !is_dir($this->output_dir)) {
             throw new Exception(
@@ -60,10 +56,9 @@ class CompressAndConvertImages
         }
 
         $this->logger = $log;
-        $this->quality = $_ENV['QUALITY'];
-        $this->extension = $_ENV['EXTENSION'];
-        $this->fl_zip =
-            (isset($_ENV['FL_ZIP']) ? boolval($_ENV['FL_ZIP']) : false);
+        $this->quality = $quality;
+        $this->extension = $extension;
+        $this->fl_zip = $fl_zip;
     }
 
     /**
@@ -143,7 +138,7 @@ class CompressAndConvertImages
         // encode img by path
         $encoded = $image->encodeByPath(
             $compressed_filepath,
-            quality: intval($this->quality)
+            quality: $this->quality
         );
         $encoded->save($compressed_filepath);
 
@@ -262,9 +257,30 @@ class CompressAndConvertImages
  *
  * @var $log
  */
-$log->info("**** START ****");
 try {
-    $compressor = new CompressAndConvertImages($log);
+    $log->info("**** START ****");
+    $mandatory_params = [
+        'INPUT',
+        'OUTPUT',
+        'QUALITY',
+        'EXTENSION',
+    ];
+    foreach ($mandatory_params as $mandatory_param) {
+        if (!isset($_ENV[$mandatory_param])) {
+            throw new Exception(
+                'Mandatory param missed in env: ' .
+                $mandatory_param
+            );
+        }
+    }
+    $compressor = new CompressAndConvertImages(
+        $log,
+        $_ENV['INPUT'],
+        $_ENV['OUTPUT'],
+        $_ENV['EXTENSION'],
+        intval($_ENV['QUALITY']),
+        (isset($_ENV['FL_ZIP']) ? boolval($_ENV['FL_ZIP']) : false)
+    );
     $compressor->run();
     $log->info("**** END ****");
 } catch (NoFilesException | Exception $e) {
