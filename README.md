@@ -18,4 +18,5 @@ Hello there! This is a simple utility to compress and convert your photos or ima
 - To convert your images without compression, set the `EXTENSION` in the .env file to your desired format (e.g., "webp") and leave the `QUALITY` as `100`.
 - To convert and compress your images to WEBP format with 20% compression, set the `EXTENSION` in the `.env` file to `webp` and adjust the `QUALITY` to `20`.
 
-If you encounter any issues or have questions, feel free to reach out!
+If you encounter any issues or have questions, feel free to reach out! And don't forget to check out my website at:
+https://www.francescopieraccini.it/
