@@ -6,6 +6,7 @@
  * @var Logger $log
  */
 
+use FPDEV\Images\NoFilesException;
 use Monolog\Logger;
 
 require_once __DIR__ . '/include/setup/config.php';
@@ -29,17 +30,7 @@ try {
             );
         }
     }
-
-    // check FL_ZIP in env
-    if (!isset($_ENV['FL_ZIP']) || strtolower($_ENV['FL_ZIP']) === 'false') {
-        $fl_zip = false;
-    } elseif (isset($_ENV['FL_ZIP']) && strtolower($_ENV['FL_ZIP']) === 'true') {
-        $fl_zip = true;
-    } else {
-        throw new Exception(
-            "Env var FL_ZIP value not valid. Set it to 'true' or 'false'"
-        );
-    }
+    $fl_zip = getFlagZip();
 
     // run procedure
     $procedure = new ProcedureCompressAndConvertImages(
@@ -59,3 +50,23 @@ try {
     $log->warning("**** INTERRUPTED ****");
 }
 exit();
+
+/**
+ * Check FL_ZIP in env
+ *
+ * @return bool
+ * @throws Exception
+ */
+function getFlagZip(): bool
+{
+    if (!isset($_ENV['FL_ZIP']) || strtolower($_ENV['FL_ZIP']) === 'false') {
+        $fl_zip = false;
+    } elseif (isset($_ENV['FL_ZIP']) && strtolower($_ENV['FL_ZIP']) === 'true') {
+        $fl_zip = true;
+    } else {
+        throw new Exception(
+            "Env var FL_ZIP value not valid. Set it to 'true' or 'false'"
+        );
+    }
+    return $fl_zip;
+}

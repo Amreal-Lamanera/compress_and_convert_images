@@ -1,6 +1,7 @@
 <?php
 
-use FPDEV\CompressAndConvertImages;
+use FPDEV\Images\CompressAndConvertImages;
+use FPDEV\Images\NoFilesException;
 use Monolog\Logger;
 
 /**

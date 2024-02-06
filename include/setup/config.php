@@ -16,6 +16,11 @@ $logRotate = new RotatingFileHandler("./logs/checkImgs.log", 10);
 // files handler
 $log->pushHandler($logRotate);
 
-// dotenv load
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/env');
-$dotenv->load();
+try {
+    // dotenv load
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/env');
+    $dotenv->load();
+} catch (Exception $e) {
+    $log->error('Env file not found. ' . $e->getMessage());
+    die();
+}
