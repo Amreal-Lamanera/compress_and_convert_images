@@ -75,7 +75,7 @@ class CompressAndConvertImages
                 $file !== '.gitkeep'
             ) {
                 if (
-                in_array(strtolower($file_ext), self::FILE_EXT_ALLOWED)
+                    in_array(strtolower($file_ext), self::FILE_EXT_ALLOWED)
                 ) {
                     $acceptedFiles[] = [
                         'ext' => $file_ext,

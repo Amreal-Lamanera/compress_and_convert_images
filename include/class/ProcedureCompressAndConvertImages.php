@@ -30,8 +30,7 @@ class ProcedureCompressAndConvertImages
         $input_dir,
         $output_dir,
         $fl_zip
-    )
-    {
+    ) {
         $this->logger = $log;
         $this->fl_zip = $fl_zip;
         $this->input_dir = $input_dir;
@@ -56,8 +55,7 @@ class ProcedureCompressAndConvertImages
     public function run(
         string $extension,
         int $quality,
-    )
-    {
+    ) {
         $compressor = new CompressAndConvertImages(
             $extension,
             $quality
