@@ -1,4 +1,4 @@
-# Compress And Convert Images <a href="https://www.francescopieraccini.it/"><img src="./blue_nome.svg"  alt="FrancescoPieraccini Logo" width="75" style="vertical-align:middle; padding-left:1rem;"/></a>
+# Compress And Convert Images <a href="https://www.francescopieraccini.it/"><img src="./light_blue_nome.svg"  alt="FrancescoPieraccini Logo" width="75" style="vertical-align:middle; padding-left:1rem;"/></a>
 Hello there! This is a simple utility to compress and convert your photos or images.
 It uses my library FP\compress_and_convert_images_library, you can check it
 [here](https://github.com/Amreal-Lamanera/compress_and_convert_images_library)
